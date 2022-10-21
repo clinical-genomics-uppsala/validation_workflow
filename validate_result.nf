@@ -43,7 +43,7 @@ process validate_vcf_gz {
     """
 }
 
-process valiage_mutations_and_coverage {
+process validate_mutations_and_coverage {
     input:
       tuple val(input_file), val(checksum)
 
@@ -55,7 +55,7 @@ process valiage_mutations_and_coverage {
 
     """
     md5=\$(cat ${input_file} |
-           awk '{if(\$5 ~/&/) {split(\$5, arr, "&"); joined=""; asort(arr, arr_s);for (i=1; i <= length(arr_s); i++){ joined=joined"&"arr_s[i];} \$5=joined}; | 
+           awk '{if(\$5 ~/&/) {split(\$5, arr, "&"); joined=""; asort(arr, arr_s);for (i=1; i <= length(arr_s); i++){ joined=joined"&"arr_s[i];} \$5=joined};' | 
            md5sum |
            awk '{print(\$1)}')
     """
@@ -126,7 +126,7 @@ process validate_collection_of_files {
       tuple val(input_file), val(checksum), env(md5)
 
     when:
-        input_file =~ /msisensor_pro\.score\.tsv$|cnvkit\.loh\.cns$|cnvkit\.scatter\.png$|gatk_cnv\.seg$|cnv_report\.tsv$|\.gene_fuse_report\.tsv$|hrd_score\.txt$|TMB\.txt$/
+        input_file =~ /msisensor_pro\.score\.tsv$|cnvkit\.loh\.cns$|cnvkit\.scatter\.png$|gatk_cnv\.seg$|cnv_report\.tsv$|\.gene_fuse_report\.tsv$|hrd_score\.txt$|TMB\.txt$|hrd.*\.txt$|table$|cnv\.html$/
  
     """
     md5=\$(cat ${input_file} |
@@ -221,6 +221,7 @@ workflow validate {
             validate_vcf_gz &
             validate_metrics &
             validate_multiqc &
+            validate_mutations_and_coverage &
             validate_samtool_stats &
             validate_collection_of_files &
             validate_genefuse &
@@ -234,6 +235,7 @@ workflow create_validation_data {
             validate_vcf_gz &
             validate_metrics &
             validate_multiqc &
+            validate_mutations_and_coverage &
             validate_samtool_stats &
             validate_collection_of_files &
             validate_genefuse &
