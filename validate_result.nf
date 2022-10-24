@@ -55,7 +55,7 @@ process validate_mutations_and_coverage {
 
     """
     md5=\$(cat ${input_file} |
-           awk '{if(\$5 ~/&/) {split(\$5, arr, "&"); joined=""; asort(arr, arr_s);for (i=1; i <= length(arr_s); i++){ joined=joined"&"arr_s[i];} \$5=joined};' | 
+           awk '{if(\$5 ~/&/) {split(\$5, arr, "&"); joined=""; asort(arr, arr_s);for (i=1; i <= length(arr_s); i++){ joined=joined"&"arr_s[i];} \$5=joined}; print($0)}' | 
            md5sum |
            awk '{print(\$1)}')
     """
