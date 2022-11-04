@@ -93,7 +93,7 @@ process validate_multiqc {
 
     """
     md5=\$(cat ${input_file} |
-        sed 's/generated on [0-9:, -]*//' | sed 's/mqc_analysis_path.*code/mqc_analysis_pathcode/g' | sed 's/able[A-Za-zw_ ]*/able_/g' |
+        sed 's/generated on [0-9:, -]*//' | sed 's/mqc_analysis_path.*code/mqc_analysis_pathcode/g' | sed 's/able[A-Za-zw_ ]*/able/g' |
         md5sum |
         awk '{print(\$1)}')
     """
