@@ -43,7 +43,7 @@ process validate_vcf_gz {
     """
 }
 
-process valiage_mutations_and_coverage {
+process validate_mutations_and_coverage {
     input:
       tuple val(input_file), val(checksum)
 
@@ -55,7 +55,7 @@ process valiage_mutations_and_coverage {
 
     """
     md5=\$(cat ${input_file} |
-           awk '{if(\$5 ~/&/) {split(\$5, arr, "&"); joined=""; asort(arr, arr_s);for (i=1; i <= length(arr_s); i++){ joined=joined"&"arr_s[i];} \$5=joined}; | 
+           awk '{if(\$5 ~/&/) {split(\$5, arr, "&"); joined=""; asort(arr, arr_s);for (i=1; i <= length(arr_s); i++){ joined=joined"&"arr_s[i];} \$5=joined}; print(\$0)}' | 
            md5sum |
            awk '{print(\$1)}')
     """
@@ -107,7 +107,7 @@ process validate_collection_of_files {
       tuple val(input_file), val(checksum), env(md5)
 
     when:
-        input_file =~ /msisensor_pro\.score\.tsv$|cnvkit\.loh\.cns$|cnvkit\.scatter\.png$|gatk_cnv\.seg$|cnv_report\.tsv$|\.gene_fuse_report\.tsv$|hrd_score\.txt$|TMB\.txt$/
+        input_file =~ /tc\.txt$|deletions\.tsv$|report\.tsv$|score\.txt$|score\.tsv$|cnvkit\.loh\.cns$|cnvkit\.scatter\.png$|gatk_cnv\.seg$|cnv_report\.tsv$|\.gene_fuse_report\.tsv$|hrd_score\.txt$|TMB\.txt$|\.table$/
  
     """
     md5=\$(cat ${input_file} |
@@ -131,6 +131,25 @@ process validate_genefuse {
          awk '{if(/^# genefuse/) exit(0); print(\$0)}' |
          md5sum |
          awk '{print(\$1)}')
+    """
+}
+
+process validate_multiqc {
+    input:
+      tuple val(input_file), val(checksum)
+
+    output:
+      tuple val(input_file), val(checksum), env(md5)
+
+    when:
+        input_file =~ /multiqc_.*\.html$/
+   
+
+    """
+    md5=\$(cat ${input_file} |
+        sed 's/generated on [0-9:, -]*//' | sed 's/mqc_analysis_path.*code/mqc_analysis_pathcode/g' | sed 's/able[_ ][A-Za-z]*/able_/g' |
+        md5sum |
+        awk '{print(\$1)}')
     """
 }
 
@@ -201,6 +220,8 @@ workflow validate {
             validate_vcf & 
             validate_vcf_gz &
             validate_metrics &
+            validate_multiqc &
+            validate_mutations_and_coverage &
             validate_samtool_stats &
             validate_collection_of_files &
             validate_genefuse &
@@ -213,6 +234,8 @@ workflow create_validation_data {
             validate_vcf &  
             validate_vcf_gz &
             validate_metrics &
+            validate_multiqc &
+            validate_mutations_and_coverage &
             validate_samtool_stats &
             validate_collection_of_files &
             validate_genefuse &
