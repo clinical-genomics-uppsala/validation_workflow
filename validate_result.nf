@@ -80,6 +80,25 @@ process validate_metrics {
 
 }
 
+process validate_multiqc {
+    input:
+      tuple val(input_file), val(checksum)
+
+    output:
+      tuple val(input_file), val(checksum), env(md5)
+
+    when:
+        input_file =~ /multiqc_.*\.html$/
+
+
+    """
+    md5=\$(cat ${input_file} |
+        sed 's/generated on [0-9:, -]*//' | sed 's/mqc_analysis_path.*code/mqc_analysis_pathcode/g' | sed 's/able[A-Za-zw_ ]*/able/g' |
+        md5sum |
+        awk '{print(\$1)}')
+    """
+}
+
 process validate_samtool_stats {
     input:
       tuple val(input_file), val(checksum)
