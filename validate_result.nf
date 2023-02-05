@@ -148,6 +148,8 @@ process validate_genefuse {
     """
     md5=\$(cat ${input_file} | 
          awk '{if(/^# genefuse/) exit(0); print(\$0)}' |
+         sed 's/^>[0-9]*,//g'  |
+         sort |
          md5sum |
          awk '{print(\$1)}')
     """
