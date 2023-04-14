@@ -126,7 +126,7 @@ process validate_collection_of_files {
       tuple val(input_file), val(checksum), env(md5)
 
     when:
-        input_file =~ /tc\.txt$|deletions\.tsv$|report\.tsv$|score\.txt$|score\.tsv$|cnvkit\.loh\.cns$|cnvkit\.scatter\.png$|gatk_cnv\.seg$|cnv_report\.tsv$|\.gene_fuse_report\.tsv$|hrd_score\.txt$|TMB\.txt$|\.table$/
+        input_file =~ /tc\.txt$|deletions\.tsv$|report\.[ct]sv$|score\.txt$|score\.tsv$|cnvkit\.loh\.cns$|cnvkit\.scatter\.png$|gatk_cnv\.seg$|cnv_report\.tsv$|\.gene_fuse_report\.tsv$|hrd_score\.txt$|TMB\.txt$|\.table$/
  
     """
     md5=\$(cat ${input_file} |
