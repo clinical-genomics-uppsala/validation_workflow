@@ -248,8 +248,8 @@ workflow create_validation_data {
 
 workflow {
    main:
-      //validate()
-      create_validation_data()
+      validate()
+      //create_validation_data()
 
 }
 
