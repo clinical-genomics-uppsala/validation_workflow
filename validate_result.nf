@@ -156,7 +156,7 @@ process validate_genefuse {
 }
 
 
-process validate_bam {
+process validate_dna_bam {
     input:
       tuple val(input_file), val(checksum)
 
@@ -164,7 +164,7 @@ process validate_bam {
        tuple val(input_file), val(checksum), env(md5)
 
     when:
-        input_file =~ /\.bam$/
+        input_file =~ /[TN]\.bam$/
  
     """
     md5=\$(samtools view ${input_file} |
@@ -173,7 +173,7 @@ process validate_bam {
     """
 }
 
-process checksum_bam {
+process validate_rna_bam {
     input:
       tuple val(input_file), val(checksum)
 
@@ -181,14 +181,15 @@ process checksum_bam {
        tuple val(input_file), val(checksum), env(md5)
 
     when:
-        input_file =~ /\.bam$/
- 
+        input_file =~ /fusion\.bam$/
+
     """
-    md5=\$(samtools view ${input_file} |
-           md5sum |
-           awk '{print(\$1)}')
+    md5=\$(samtools view ${input_file} | sort |
+           md5sum | awk '{print(\$1)}');
+    echo \$md5 | awk 'BEGIN{ORS=""}{if(\$1 == "${checksum}") {print("Validated: ${input_file}"); exit(0)} else { print("Failed validation: ${input_file}: ${checksum} != "\$1); exit(1)}}'
     """
 }
+
 
 process validate_checksum {
     input:
@@ -228,7 +229,8 @@ workflow validate {
             validate_samtool_stats &
             validate_collection_of_files &
             validate_genefuse &
-            validate_bam ) | mix | validate_checksum
+            validate_rna_bam &
+            validate_dna_bam ) | mix | validate_checksum
 }
 
 workflow create_validation_data {
@@ -242,7 +244,8 @@ workflow create_validation_data {
             validate_samtool_stats &
             validate_collection_of_files &
             validate_genefuse &
-            checksum_bam ) | mix |
+            validate_dna_bam &
+            validate_rna_bam ) | mix |
             create_checksum_file | collectFile(name: "test.txt", newLine: false, storeDir: "result") | view
 }
 
