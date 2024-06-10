@@ -51,7 +51,7 @@ process validate_mutations_and_coverage {
       tuple val(input_file), val(checksum), env(md5)
 
     when:
-      input_file =~ /coverage_and_mutations\.tsv$/
+      input_file =~ /coverage_and_mutations\./
 
     """
     md5=\$(cat ${input_file} |
