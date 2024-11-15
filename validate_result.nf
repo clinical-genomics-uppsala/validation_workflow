@@ -126,7 +126,7 @@ process validate_collection_of_files {
       tuple val(input_file), val(checksum), env(md5)
 
     when:
-        input_file =~ /tc\.txt$|deletions\.tsv$|report\.[ct]sv$|score\.txt$|score\.tsv$|cnvkit\.loh\.cns$|cnvkit\.scatter\.png$|gatk_cnv\.seg$|cnv_report\.tsv$|\.gene_fuse_report\.tsv$|hrd_score\.txt$|TMB\.txt$|\.table$|\.purity.txt$|amplifications\.tsv$|fuseq_wes\.report\.csv$$|exon_skipping\.tsv$|fusion_report\.tsv$|ouse_keeping_gene_coverage\.tsv$|arriba.fusions\.tsv$|fusion_predictions\.txt$/
+        input_file =~ /tc\.txt$|deletions\.tsv$|report\.[ct]sv$|score\.txt$|score\.tsv$|cnvkit\.loh\.cns$|cnvkit\.scatter\.png$|gatk_cnv\.seg$|cnv_report\.tsv$|\.gene_fuse_report\.tsv$|hrd_score\.txt$|TMB\.txt$|\.table$|\.purity.txt$|amplifications\.tsv$|fuseq_wes\.report\.csv$|fuseq_wes\.unfiltered\.results\.csv$|exon_skipping\.tsv$|fusion_report\.tsv$|ouse_keeping_gene_coverage\.tsv$|arriba.fusions\.tsv$|fusion_predictions\.txt$/
  
     """
     md5=\$(cat ${input_file} |
