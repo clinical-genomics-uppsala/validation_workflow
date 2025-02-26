@@ -13,12 +13,50 @@ process validate_vcf {
       tuple val(input_file), val(checksum), env(md5) 
 
     when: 
-      input_file =~ /vcf$/
+      input_file =~ /vcf$/ && !(input_file =~ /svdb_query.vcf$/) && !(input_file =~ /id_snps.vcf$/)
       
     """
     md5=\$(cat ${input_file} | 
            awk 'BEING{START_PRINT=0}{if(START_PRINT) print(\$0); if(/^#CHROM/) START_PRINT=1; }'|  
            awk '{if(\$8 ~/&/) {split(\$8, arr, "[&|]"); joined=""; asort(arr, arr_s);for (i=1; i <= length(arr_s); i++){ joined=joined"&"arr_s[i];} \$8=joined}; print(\$0)}' |  
+           md5sum |
+           awk '{print(\$1)}')
+    """
+}
+
+process validate_svdb_query_vcf {
+    input:
+      tuple val(input_file), val(checksum)
+
+    output:
+      tuple val(input_file), val(checksum), env(md5)
+
+    when: 
+      input_file =~ /svdb_query.vcf$/
+      
+    """
+    md5=\$(cat ${input_file} | 
+           awk 'BEING{START_PRINT=0}{if(START_PRINT) print(\$0); if(/^#CHROM/) START_PRINT=1; }'|  
+           awk '{print(\$1,\$2,\$5)}' |  
+           md5sum |
+           awk '{print(\$1)}')
+    """
+}
+
+process validate_id_snps_vcf {
+    input:
+      tuple val(input_file), val(checksum)
+
+    output:
+      tuple val(input_file), val(checksum), env(md5)
+
+    when: 
+      input_file =~ /id_snps.vcf$/
+      
+    """
+    md5=\$(cat ${input_file} | 
+           awk '\$0 !~ /^#/ && NF' |  
+           awk '{if(\$10 ~/:/) {split(\$10,arr,":")}; new=arr[1]; \$10=new; print(\$1,\$2,\$4,\$5,\$10)}' |  
            md5sum |
            awk '{print(\$1)}')
     """
@@ -126,7 +164,7 @@ process validate_collection_of_files {
       tuple val(input_file), val(checksum), env(md5)
 
     when:
-        input_file =~ /tc\.txt$|deletions\.tsv$|report\.[ct]sv$|score\.txt$|score\.tsv$|cnvkit\.loh\.cns$|cnvkit\.scatter\.png$|gatk_cnv\.seg$|cnv_report\.tsv$|\.gene_fuse_report\.tsv$|hrd_score\.txt$|TMB\.txt$|\.table$|\.purity.txt$|amplifications\.tsv$|fuseq_wes\.report\.csv$|fuseq_wes\.unfiltered\.results\.csv$|exon_skipping\.tsv$|fusion_report\.tsv$|ouse_keeping_gene_coverage\.tsv$|arriba.fusions\.tsv$|fusion_predictions\.txt$/
+        input_file =~ /tc\.txt$|deletions\.tsv$|report\.[ct]sv$|score\.txt$|score\.tsv$|cnvkit\.loh\.cns$|cnvkit\.scatter\.png$|gatk_cnv\.seg$|cnv_report\.tsv$|\.gene_fuse_report\.tsv$|hrd_score\.txt$|TMB\.txt$|\.table$|\.purity.txt$|amplifications\.tsv$|fuseq_wes\.report\.csv$|fuseq_wes\.unfiltered\.results\.csv$|exon_skipping\.tsv$|fusion_report\.tsv$|ouse_keeping_gene_coverage\.tsv$|arriba.fusions\.tsv$|fusions\.txt$|fusion_predictions\.txt$|purecn_purity_ploidity\.csv$|sample_mixup_check\.tsv$/
  
     """
     md5=\$(cat ${input_file} |
@@ -256,7 +294,9 @@ process create_checksum_file {
 workflow validate {
       ch = Channel.fromPath(params.input).splitCsv( header:true, sep:"\t" ).map(row -> [file(row.file), row.checksum])
       ch | (
-            validate_vcf & 
+            validate_vcf &
+            validate_svdb_query_vcf &
+            validate_id_snps_vcf &
             validate_vcf_gz &
             validate_metrics &
             validate_multiqc &
@@ -271,7 +311,9 @@ workflow validate {
 workflow create_validation_data {
     ch = Channel.fromPath(params.input).splitCsv( header:true, sep:"\t" ).map(row -> [file(row.file), row.checksum])
     ch | (
-            validate_vcf &  
+            validate_vcf &
+            validate_svdb_query_vcf &
+            validate_id_snps_vcf &
             validate_vcf_gz &
             validate_metrics &
             validate_multiqc &
