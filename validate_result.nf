@@ -13,7 +13,7 @@ process validate_vcf {
       tuple val(input_file), val(checksum), env(md5) 
 
     when: 
-      input_file =~ /vcf$/ && !(input_file =~ /svdb_query.vcf$/) && !(input_file =~ /id_snps.vcf$/)
+      input_file =~ /vcf$/ && !(input_file =~ /svdb_query.vcf$/) && !(input_file =~ /id_snps.vcf$/) && !(input_file =~ /jumble.vcf$/)
       
     """
     md5=\$(cat ${input_file} | 
@@ -24,7 +24,7 @@ process validate_vcf {
     """
 }
 
-process validate_svdb_query_vcf {
+process validate_svdb_query_jumble_vcf {
     input:
       tuple val(input_file), val(checksum)
 
@@ -32,7 +32,7 @@ process validate_svdb_query_vcf {
       tuple val(input_file), val(checksum), env(md5)
 
     when: 
-      input_file =~ /svdb_query.vcf$/
+      input_file =~ /svdb_query.vcf$/ || /jumble.vcf$/
       
     """
     md5=\$(cat ${input_file} | 
@@ -295,7 +295,7 @@ workflow validate {
       ch = Channel.fromPath(params.input).splitCsv( header:true, sep:"\t" ).map(row -> [file(row.file), row.checksum])
       ch | (
             validate_vcf &
-            validate_svdb_query_vcf &
+            validate_svdb_query_jumble_vcf &
             validate_id_snps_vcf &
             validate_vcf_gz &
             validate_metrics &
@@ -312,7 +312,7 @@ workflow create_validation_data {
     ch = Channel.fromPath(params.input).splitCsv( header:true, sep:"\t" ).map(row -> [file(row.file), row.checksum])
     ch | (
             validate_vcf &
-            validate_svdb_query_vcf &
+            validate_svdb_query_jumble_vcf &
             validate_id_snps_vcf &
             validate_vcf_gz &
             validate_metrics &
