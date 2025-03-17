@@ -32,7 +32,7 @@ process validate_svdb_query_jumble_vcf {
       tuple val(input_file), val(checksum), env(md5)
 
     when: 
-      input_file =~ /svdb_query.vcf$/ || /jumble.vcf$/
+      input_file =~ /svdb_query.vcf$/ || input_file =~ /jumble.vcf$/
       
     """
     md5=\$(cat ${input_file} | 
