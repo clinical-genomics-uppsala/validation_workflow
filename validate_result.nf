@@ -164,7 +164,7 @@ process validate_collection_of_files {
       tuple val(input_file), val(checksum), env(md5)
 
     when:
-        input_file =~ /tc\.txt$|deletions\.tsv$|report\.[ct]sv$|score\.txt$|cnvkit\.loh\.cns$|cnvkit\.scatter\.png$|gatk_cnv\.seg$|cnv_report\.tsv$|\.gene_fuse_report\.tsv$|hrd_score\.txt$|TMB\.txt$|\.table$|\.purity.txt$|amplifications\.tsv$|fuseq_wes\.report\.csv$|fuseq_wes\.unfiltered\.results\.csv$|exon_skipping\.tsv$|fusion_report\.tsv$|ouse_keeping_gene_coverage\.tsv$|arriba.fusions\.tsv$|fusions\.txt$|fusion_predictions\.txt$|purecn_purity_ploidity\.csv$|sample_mixup_check\.tsv$/
+        input_file =~ /tc\.txt$|deletions\.tsv$|report\.[ct]sv$|cnvkit\.loh\.cns$|cnvkit\.scatter\.png$|gatk_cnv\.seg$|cnv_report\.tsv$|\.gene_fuse_report\.tsv$|TMB\.txt$|\.table$|\.purity.txt$|amplifications\.tsv$|fuseq_wes\.report\.csv$|fuseq_wes\.unfiltered\.results\.csv$|exon_skipping\.tsv$|fusion_report\.tsv$|ouse_keeping_gene_coverage\.tsv$|arriba.fusions\.tsv$|fusions\.txt$|fusion_predictions\.txt$|purecn_purity_ploidity\.csv$|sample_mixup_check\.tsv$/
  
     """
     md5=\$(cat ${input_file} |
