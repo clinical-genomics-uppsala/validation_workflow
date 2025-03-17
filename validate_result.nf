@@ -70,7 +70,7 @@ process validate_vcf_gz {
       tuple val(input_file), val(checksum), env(md5)
 
     when: 
-      input_file =~ /vcf.gz$/ && !(input_file =~ /germline.vcf.gz$/)
+      input_file =~ /vcf.gz$/ && !(input_file =~ /germline.vcf.gz$/) && !(input_file =~ /gatk_mutect2$/)
       
     """
     md5=\$(zcat ${input_file} | 
