@@ -13,7 +13,7 @@ process validate_vcf {
       tuple val(input_file), val(checksum), env(md5) 
 
     when: 
-      input_file =~ /vcf$/ && !(input_file =~ /svdb_query.vcf$/) && !(input_file =~ /id_snps.vcf$/) && !(input_file =~ /jumble.vcf$/)
+      input_file =~ /vcf$/ && !(input_file =~ /svdb_query.vcf$/) && !(input_file =~ /id_snps.vcf$/) && !(input_file =~ /jumble.vcf$/) && !(input_file =~ /soft_filter.vcf$/)
       
     """
     md5=\$(cat ${input_file} | 
